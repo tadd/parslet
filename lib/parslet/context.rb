@@ -1,5 +1,3 @@
-require 'blankslate'
-
 # Provides a context for tree transformations to run in. The context allows
 # accessing each of the bindings in the bindings hash as local method.
 #
@@ -11,12 +9,12 @@ require 'blankslate'
 #   end
 #
 # @api private
-class Parslet::Context < BlankSlate
-  reveal :methods
-  reveal :respond_to?
-  reveal :inspect
-  reveal :to_s
-  reveal :instance_variable_set
+class Parslet::Context
+  RESERVED =
+    (%w(methods respond_to? inspect to_s instance_variable_set object_id) +
+     BasicObject.instance_methods).map(&:to_sym)
+  private_constant :RESERVED
+  instance_methods.each { |m| undef_method m unless RESERVED.include?(m) }
   
   def meta_def(name, &body)
     metaclass = class <<self; self; end
